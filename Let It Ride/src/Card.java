@@ -1,16 +1,17 @@
 
 public class Card {
-	String value, type;
-	Card(String v, String t){
-		value = v;
-		type = t;
-		
+	public enum Suit {CLUBS, SPADES, HEARTS, DIAMONDS};
+	public enum Rank {TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE}
+	Suit suit;
+	Rank rank;
+	Card(Suit s, Rank r){
+		suit = s;
+		rank = r;
 	}
 	
-	String getValue(){return value;}
-	String getType(){return type;}
+	Suit getSuit(){return suit;}
+	Rank getRank(){return rank;}
 	
-	void setValue(String v){value = v;}
-	void setType(String t){type = t;}
-	
+	void setSuit(Suit s){suit = s;}
+	void setType(Rank r){rank = r;}
 }
