@@ -1,11 +1,17 @@
+package project3808;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,14 +24,42 @@ public class LetItRide extends JFrame{
 	String safeRetrieval;
 	int bet;
 	int totalBet;
-	
+	ArrayList<String> cardNames = new ArrayList<String>();
 	public LetItRide(){
 		gui = new LetItRideGUI();
 		player = new Player();
-		initDeck();
+		
 		initButtonListeners();
 	}
-	
+	private void updateHand(){
+		for (int i = 0; i < 5; i++){
+			gui.cardLabel.get(i).setEnabled(false);
+		}
+		BufferedImage myPicture = null;
+		for (int i = 0; i < player.getHandLength(); i++){
+			gui.cardLabel.get(i).setEnabled(true);
+			if(player.getHandLength() == 0){
+				try {
+				    myPicture = ImageIO.read(new File("src/images/back.png"));
+				} catch (IOException e) {
+					System.out.println(e);
+				}	
+				
+				gui.cardLabel.get(i).setIcon(new ImageIcon(myPicture));
+				gui.cardLabel.get(i).updateUI();
+			}
+			
+			try {
+			    myPicture = ImageIO.read(new File("src/images/" + cardNames.get(i)));
+			} catch (IOException e) {
+				System.out.println(e);
+			}
+			gui.cardLabel.get(i).setIcon(null);
+			//gui.cardLabel.get(i).revalidate();
+			gui.cardLabel.get(i).setIcon(new ImageIcon(myPicture));
+			gui.cardLabel.get(i).setHorizontalTextPosition(0);
+		}
+	}
 	private void initButtonListeners() {
 		gui.newRoundButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -60,6 +94,9 @@ public class LetItRide extends JFrame{
 		Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
 		deckOfCards.remove(card);
 		player.addCard(card);
+		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
+		updateHand();
+		
 		System.out.println("Letting it ride! Total betting amount is now " + totalBet + " with the following cards:");
 		for (Card playerCard : player.getHand()){
 			System.out.println(playerCard.getRank() + " of " + playerCard.getSuit());
@@ -73,6 +110,8 @@ public class LetItRide extends JFrame{
 		Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
 		deckOfCards.remove(card);
 		player.addCard(card);
+		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
+		updateHand();
 		System.out.println("Pulled your bet! Total betting amount is still " + totalBet + " with the following cards:");
 		for (Card playerCard : player.getHand()){
 			System.out.println(playerCard.getRank() + " of " + playerCard.getSuit());
@@ -87,6 +126,7 @@ public class LetItRide extends JFrame{
 		String[] results = result.split(":");
 		player.setMoney(player.getMoney() + Integer.parseInt(results[1]));
 		System.out.println("Final Hand: " + results[0] + "!");
+		gui.playerMoneyAmount.setText(Integer.toString(player.getMoney()));
 		gui.pullButton.setEnabled(false);
 		gui.rideButton.setEnabled(false);
 		gui.newRoundButton.setEnabled(true);
@@ -96,6 +136,7 @@ public class LetItRide extends JFrame{
 	// keeps unique values. This makes it easy to find the number of distinct ranks in a hand!
 	private String calculateScore(ArrayList<Card> hand, int totalBet2) {
 		HashSet<Card.Rank> ranks = new HashSet<Card.Rank>();
+		
 		Card.Suit targetSuit;
 		int smallestValue = 20;
 		int largestValue = 0;
@@ -107,6 +148,7 @@ public class LetItRide extends JFrame{
 			(card.getRank() == Card.Rank.QUEEN) || (card.getRank() == Card.Rank.KING) ||
 			(card.getRank() == Card.Rank.ACE)) && (card.getSuit() == targetSuit)){
 				ranks.add(card.getRank());
+				
 			}
 		}
 		if (ranks.size() == 5){
@@ -184,11 +226,19 @@ public class LetItRide extends JFrame{
 		else if ((ranks.size() == 4) && (largestValue >= 10)){
 			int tally = 0;
 			for(Card card : hand){
-				if (card.getValue() == largestValue){
-					tally += 1;
+				//if (card.getValue() == largestValue){
+				//	tally += 1;
+				//}
+				for (int i = 0; i < hand.size(); i++){
+			
+					if(card.getValue() == hand.get(i).getValue() && card.getValue() >= 10){
+						if(card.getSuit() != hand.get(i).getSuit()){
+							tally += 1;
+						}
+					}	
 				}
-			}
-			if (tally >= 2){
+			}			
+			if (tally == 2){
 				// High Pair [x]
 				return ("High Pair:" + totalBet2);
 			}
@@ -205,11 +255,13 @@ public class LetItRide extends JFrame{
 			}
 			value++;
 		}
+		
 	}
 	
 	private void startNewRound(){
 		initDeck();
 		player.clearHand();
+		updateHand();
 		safeRetrieval = gui.bettingAmount.getText();
 		if (!safeRetrieval.equals("")){
 			try{
@@ -232,17 +284,32 @@ public class LetItRide extends JFrame{
 			System.out.println("A valid betting amount must be entered!");
 		}
 		if (bet > 0){
+			
 			totalBet = bet;
 			player.setMoney(player.getMoney());
-			for (int i = 0; i < 3; i++){
-				Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
-				deckOfCards.remove(card);
-				player.addCard(card);
-			}
+			
+			Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
+			deckOfCards.remove(card);
+			player.addCard(card);
+			
+			card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
+			deckOfCards.remove(card);
+			player.addCard(card);
+			
+			card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
+			deckOfCards.remove(card);
+			player.addCard(card);
+			
+			cardNames.clear();
 			System.out.println("*****New Hand*****");
-			for (Card card : player.getHand()){
-				System.out.println(card.getRank() + " of " + card.getSuit());
+			for (Card card1 : player.getHand()){
+				System.out.println(card1.getRank() + " of " + card1.getSuit());
+				cardNames.add(card1.getRank() + "_" + card1.getSuit() + ".png");
 			}
+			
+			
+			
+			updateHand();
 			gui.rideButton.setEnabled(true);
 			gui.pullButton.setEnabled(true);
 			gui.newRoundButton.setEnabled(false);
