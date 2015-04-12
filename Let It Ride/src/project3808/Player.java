@@ -1,6 +1,9 @@
 package project3808;
 import java.util.ArrayList;
 
+/**
+ * A simple class for representing a player in-game.
+ */
 public class Player {
 	private int money;
 	private int maxMoney;

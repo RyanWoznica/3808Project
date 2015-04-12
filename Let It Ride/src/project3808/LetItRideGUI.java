@@ -24,6 +24,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JPanel;
 
+/**
+ * The Graphical User Interface for Let It Ride. Initializes and sets up all components (buttons,
+ * labels, etc) that make up the interface, and have a couple of helper functions that the main
+ * program uses for gameplay.
+ */
 public class LetItRideGUI extends JFrame{
 	
 	JButton newRoundButton = new JButton("Start a New Round!");
@@ -186,7 +191,10 @@ public class LetItRideGUI extends JFrame{
         });
         pack();
 	}
-	
+	/**
+	 * A function for displaying information via the GUI to the client.
+	 * @param text - The text to be placed in the player's info box.
+	 */
 	public void setInfoText(String text){
 		if (text.length() > 27){
 			text = text.substring(0, 26) + "\n" + text.substring(26, text.length());
@@ -194,6 +202,10 @@ public class LetItRideGUI extends JFrame{
 		infoText.setText(text);
 	}
 	
+	/**
+	 * A function for checking if the player wishes to place a bonus bet.
+	 * @return True if the bonus bet is selected, false otherwise.
+	 */
 	public boolean bonusIsChecked(){
 		return bonusCheck.isSelected();
 	}

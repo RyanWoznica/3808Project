@@ -1,4 +1,8 @@
 package project3808;
+
+/**
+ * A simple class for representing a single card in-game.
+ */
 public class Card {
 	public enum Suit {CLUBS, SPADES, HEARTS, DIAMONDS};
 	public enum Rank {TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE}
