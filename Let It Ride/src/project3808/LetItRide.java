@@ -31,7 +31,6 @@ public class LetItRide extends JFrame{
 	public LetItRide(){
 		gui = new LetItRideGUI();
 		player = new Player();
-		
 		initButtonListeners();
 	}
 	
@@ -101,14 +100,13 @@ public class LetItRide extends JFrame{
 	 * a player to "let it [their bet] ride"
 	 */
 	private void rideBet() {
-		totalBet += bet;
 		Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
 		deckOfCards.remove(card);
 		player.addCard(card);
 		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
 		updateHand();
 		
-		gui.setInfoText("Letting it ride! Total betting amount is now " + totalBet + "!");
+		gui.setInfoText("Letting it ride! Total betting amount is still " + totalBet + "!");
 		if (player.getHand().size() == 5){
 			roundEnd();
 		}
@@ -119,12 +117,15 @@ public class LetItRide extends JFrame{
 	 * a player to pull their bet.
 	 */
 	private void pullBet(){
+		totalBet = totalBet - bet;
+		player.setMoney(player.getMoney() + bet);
+		gui.playerMoneyAmount.setText(Integer.toString(player.getMoney()));
 		Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
 		deckOfCards.remove(card);
 		player.addCard(card);
 		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
 		updateHand();
-		gui.setInfoText("Pulled your bet! Total betting amount is still " + totalBet + "!");
+		gui.setInfoText("Pulled your bet! Total betting amount is now " + totalBet + "!");
 		if (player.getHand().size() == 5){
 			roundEnd();
 		}
@@ -348,7 +349,7 @@ public class LetItRide extends JFrame{
 		 * And finally, we return "Less than High Pair" if we find no matches for other categories.
 		 * Simple!
 		 */
-		return ("Less than High Pair:" + (totalBet2 * (-1)));
+		return ("Less than High Pair:" + 0);
 	}
 
 	/**
@@ -396,8 +397,9 @@ public class LetItRide extends JFrame{
 		}
 		if (bet > 0){
 			gui.setInfoText("Starting a new game!");
-			totalBet = bet;
-			player.setMoney(player.getMoney());
+			totalBet = bet*3;
+			player.setMoney(player.getMoney() - totalBet);
+			gui.playerMoneyAmount.setText(Integer.toString(player.getMoney()));
 			
 			Card card = deckOfCards.get(((int)(Math.random()*(deckOfCards.size()-1))) + 1);
 			deckOfCards.remove(card);

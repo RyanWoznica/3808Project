@@ -37,7 +37,7 @@ public class LetItRideGUI extends JFrame{
 	JButton payoutsButton = new JButton("Show Payouts");
 	JLabel bettingText = new JLabel("Betting Amount:");
 	JLabel playerMoneyText = new JLabel("Player Money:");
-	JLabel bonusBetLabel = new JLabel("Bounus Bet:");
+	JLabel bonusBetLabel = new JLabel("Bonus Bet:");
 	JCheckBox bonusCheck = new JCheckBox();
 	JTextArea bettingAmount = new JTextArea(1,4);
 	JTextField playerMoneyAmount = new JTextField("1000");
