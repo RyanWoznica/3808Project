@@ -8,7 +8,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -16,8 +18,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import project3808.Card.Rank;
+
 public class LetItRide extends JFrame{
-	
 	ArrayList<Card> deckOfCards = new ArrayList<Card>();
 	LetItRideGUI gui;
 	Player player;
@@ -64,6 +67,7 @@ public class LetItRide extends JFrame{
 		gui.newRoundButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 startNewRound();
+            	//roundEnd();
             	//testCategories();
             }
         });
@@ -97,10 +101,7 @@ public class LetItRide extends JFrame{
 		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
 		updateHand();
 		
-		System.out.println("Letting it ride! Total betting amount is now " + totalBet + " with the following cards:");
-		for (Card playerCard : player.getHand()){
-			System.out.println(playerCard.getRank() + " of " + playerCard.getSuit());
-		}
+		gui.setInfoText("Letting it ride! Total betting amount is now " + totalBet + "!");
 		if (player.getHand().size() == 5){
 			roundEnd();
 		}
@@ -112,10 +113,7 @@ public class LetItRide extends JFrame{
 		player.addCard(card);
 		cardNames.add(card.getRank() + "_" + card.getSuit() + ".png");
 		updateHand();
-		System.out.println("Pulled your bet! Total betting amount is still " + totalBet + " with the following cards:");
-		for (Card playerCard : player.getHand()){
-			System.out.println(playerCard.getRank() + " of " + playerCard.getSuit());
-		}
+		gui.setInfoText("Pulled your bet! Total betting amount is still " + totalBet + "!");
 		if (player.getHand().size() == 5){
 			roundEnd();
 		}
@@ -125,18 +123,46 @@ public class LetItRide extends JFrame{
 		String result = calculateScore(player.getHand(), totalBet);
 		String[] results = result.split(":");
 		player.setMoney(player.getMoney() + Integer.parseInt(results[1]));
-		System.out.println("Final Hand: " + results[0] + "!");
+		if(gui.bonusIsChecked()){
+			player.setMoney(player.getMoney() + getBonus(results[0]));
+		}
+		gui.setInfoText("Final Hand: " + results[0] + "!");
 		gui.playerMoneyAmount.setText(Integer.toString(player.getMoney()));
 		gui.pullButton.setEnabled(false);
 		gui.rideButton.setEnabled(false);
 		gui.newRoundButton.setEnabled(true);
 	}
 
+	private int getBonus(String string) {
+		if (string.equals("Royal Flush")){
+			return 20000;
+		}
+		else if (string.equals("Straight Flush")){
+			return 2000;
+		}
+		else if (string.equals("Four of a kind")){
+			return 400;
+		}
+		else if (string.equals("Full House")){
+			return 200;
+		}
+		else if (string.equals("Flush")){
+			return 50;
+		}
+		else if (string.equals("Straight")){
+			return 25;
+		}
+		else if (string.equals("Three of a kind")){
+			return 5;
+		}
+		else{
+			return -1;
+		}
+	}
 	// Calculates the player's final score. Note that we use a nice attribute of sets, which only
 	// keeps unique values. This makes it easy to find the number of distinct ranks in a hand!
 	private String calculateScore(ArrayList<Card> hand, int totalBet2) {
-		HashSet<Card.Rank> ranks = new HashSet<Card.Rank>();
-		
+		HashSet<Rank> ranks = new HashSet<Rank>();
 		Card.Suit targetSuit;
 		int smallestValue = 20;
 		int largestValue = 0;
@@ -189,58 +215,50 @@ public class LetItRide extends JFrame{
 			}
 		}
 		ranks.clear();
-		for (Card card : hand){
+		for(Card card : hand){
 			ranks.add(card.getRank());
 		}
-		// Check for three-of-a-kind, four-of-a-kind, full house
-		if (ranks.size() == 3){
-			int tally = 0;
-			for(Card card : hand){
-				if (card.getValue() == largestValue){
-					tally += 1;
-				}
-			}
-			if ((tally == 2) || (tally == 3)){
-				// Three-of-a-kind [x]
-				return ("Three of a kind:" + (totalBet2 * 3));
-			}
-		}
-		else if (ranks.size() == 2){
-			// 4 OAK or Full House
-			int tally = 0;
-			for(Card card : hand){
-				if (card.getValue() == largestValue){
-					tally += 1;
-				}
-			}
-			if ((tally == 2) || (tally == 3)){
-				// Full House [x]
-				return ("Full House:" + (totalBet2 * 11));
+		HashMap<Rank, Integer> map = new HashMap<Rank, Integer>();
+		for(Card card : hand){
+			if (map.get(card.getRank()) != null){
+				int x = map.get(card.getRank());
+				map.put(card.getRank(), x+1);
 			}
 			else{
-				// 4 OAK [x]
-				return ("Four of a kind:" + totalBet2 * 50);
+				map.put(card.getRank(), 1);
 			}
-			
 		}
-		else if ((ranks.size() == 4) && (largestValue >= 10)){
-			int tally = 0;
-			for(Card card : hand){
-				//if (card.getValue() == largestValue){
-				//	tally += 1;
-				//}
-				for (int i = 0; i < hand.size(); i++){
-			
-					if(card.getValue() == hand.get(i).getValue() && card.getValue() >= 10){
-						if(card.getSuit() != hand.get(i).getSuit()){
-							tally += 1;
-						}
-					}	
+		if ((ranks.size() == 4) && (largestValue >= 10)){
+			for (Entry<Rank, Integer> entry : map.entrySet()){
+				if ((entry.getKey() == Rank.TEN || entry.getKey() == Rank.JACK || entry.getKey() == Rank.QUEEN || 
+						entry.getKey() == Rank.KING || entry.getKey() == Rank.ACE) && (entry.getValue() >= 2)){
+					return ("High Pair:" + totalBet2);
 				}
-			}			
+				else if(entry.getValue() == 3){
+					return ("Three of a kind:" + totalBet2*3);
+				}
+				else if(entry.getValue() == 4){
+					return ("Four of a kind:" + totalBet2*50);
+				}
+			}
+		}
+		else{
+			int tally = 0;
+			for (Entry<Rank, Integer> entry : map.entrySet()){
+				if (entry.getValue() == 2){
+					tally++;
+				}
+			}
 			if (tally == 2){
-				// High Pair [x]
-				return ("High Pair:" + totalBet2);
+				return ("Full House:" + (totalBet2 * 11));
+			}
+			for (Entry<Rank, Integer> entry : map.entrySet()){
+				if(entry.getValue() == 3){
+					return ("Three of a kind:" + totalBet2*3);
+				}
+				else if(entry.getValue() == 4){
+					return ("Four of a kind:" + totalBet2*50);
+				}
 			}
 		}
 		// No matches found, return a loss [x]
@@ -269,22 +287,22 @@ public class LetItRide extends JFrame{
 				if ((bet > player.getMoney()) || (bet < 0)){
 					gui.bettingAmount.setText("0");
 					bet = 0;
-					System.out.println("A valid betting amount must be entered!");
+					gui.setInfoText("A valid betting amount must be entered!");
 				}
 			}
 			catch (Exception e){
 				gui.bettingAmount.setText("0");
 				bet = 0;
-				System.out.println("A valid betting amount must be entered!");
+				gui.setInfoText("A valid betting amount must be entered!");
 			}
 		}
 		else{
 			gui.bettingAmount.setText("0");
 			bet = 0;
-			System.out.println("A valid betting amount must be entered!");
+			gui.setInfoText("A valid betting amount must be entered!");
 		}
 		if (bet > 0){
-			
+			gui.setInfoText("Starting a new game!");
 			totalBet = bet;
 			player.setMoney(player.getMoney());
 			
