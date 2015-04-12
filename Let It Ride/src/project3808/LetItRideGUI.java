@@ -59,15 +59,8 @@ public class LetItRideGUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLayout(new GridBagLayout());
-		
-		BufferedImage myPicture = null;
-		try {
-		    myPicture = ImageIO.read(new File("src/images/back.png"));
-		} catch (IOException e) {
-			System.out.println(e);
-		}
 		c.fill = GridBagConstraints.BOTH;
-		cardLabel1.setDisabledIcon(new ImageIcon(myPicture));
+		cardLabel1.setDisabledIcon(new ImageIcon(getClass().getResource("back.png")));
 		c.gridx = 1;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -76,7 +69,7 @@ public class LetItRideGUI extends JFrame{
         cardLabel1.setEnabled(false);
         cardLabel.add(cardLabel1);
         c.fill = GridBagConstraints.BOTH;
-        cardLabel2.setDisabledIcon(new ImageIcon(myPicture));
+        cardLabel2.setDisabledIcon(new ImageIcon(getClass().getResource("back.png")));
         c.gridx = 3;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -85,7 +78,7 @@ public class LetItRideGUI extends JFrame{
         cardLabel2.setEnabled(false);
         cardLabel.add(cardLabel2);
         c.fill = GridBagConstraints.BOTH;
-        cardLabel3.setDisabledIcon(new ImageIcon(myPicture));
+        cardLabel3.setDisabledIcon(new ImageIcon(getClass().getResource("back.png")));
         c.gridx = 5;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -94,7 +87,7 @@ public class LetItRideGUI extends JFrame{
         cardLabel3.setEnabled(false);
         cardLabel.add(cardLabel3);
         c.fill = GridBagConstraints.BOTH;
-        cardLabel4.setDisabledIcon(new ImageIcon(myPicture));
+        cardLabel4.setDisabledIcon(new ImageIcon(getClass().getResource("back.png")));
         c.gridx = 7;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -102,7 +95,7 @@ public class LetItRideGUI extends JFrame{
         add(cardLabel4, c);      
         cardLabel4.setEnabled(false);
         cardLabel.add(cardLabel4);
-        cardLabel5.setDisabledIcon(new ImageIcon(myPicture));
+        cardLabel5.setDisabledIcon(new ImageIcon(getClass().getResource("back.png")));
         c.gridx = 9;
         c.gridy = 0;
         c.gridwidth = 2;

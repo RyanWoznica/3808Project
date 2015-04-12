@@ -35,6 +35,10 @@ public class LetItRide extends JFrame{
 		initButtonListeners();
 	}
 	
+	public static void main(String[] args){
+		LetItRide game = new LetItRide();
+	}
+	
 	/**
 	 * A function for updating the cards displayed in the GUI.
 	 */
@@ -42,28 +46,15 @@ public class LetItRide extends JFrame{
 		for (int i = 0; i < 5; i++){
 			gui.cardLabel.get(i).setEnabled(false);
 		}
-		BufferedImage myPicture = null;
 		for (int i = 0; i < player.getHandLength(); i++){
 			gui.cardLabel.get(i).setEnabled(true);
 			if(player.getHandLength() == 0){
-				try {
-				    myPicture = ImageIO.read(new File("src/images/back.png"));
-				} catch (IOException e) {
-					System.out.println(e);
-				}	
-				
-				gui.cardLabel.get(i).setIcon(new ImageIcon(myPicture));
+				gui.cardLabel.get(i).setIcon(new ImageIcon(getClass().getResource(cardNames.get(i))));
 				gui.cardLabel.get(i).updateUI();
-			}
-			
-			try {
-			    myPicture = ImageIO.read(new File("src/images/" + cardNames.get(i)));
-			} catch (IOException e) {
-				System.out.println(e);
 			}
 			gui.cardLabel.get(i).setIcon(null);
 			//gui.cardLabel.get(i).revalidate();
-			gui.cardLabel.get(i).setIcon(new ImageIcon(myPicture));
+			gui.cardLabel.get(i).setIcon(new ImageIcon(getClass().getResource(cardNames.get(i))));
 			gui.cardLabel.get(i).setHorizontalTextPosition(0);
 		}
 	}
@@ -432,9 +423,5 @@ public class LetItRide extends JFrame{
 			gui.pullButton.setEnabled(true);
 			gui.newRoundButton.setEnabled(false);
 		}
-	}
-	
-	public static void main(String[] args){
-		LetItRide game = new LetItRide();
 	}
 }
