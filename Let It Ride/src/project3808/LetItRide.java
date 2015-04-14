@@ -137,7 +137,21 @@ public class LetItRide extends JFrame{
 	private void roundEnd() {
 		String result = calculateScore(player.getHand(), totalBet);
 		String[] results = result.split(":");
-		player.setMoney(player.getMoney() + Integer.parseInt(results[1]));
+		/*
+		 * Minor patch (April 14) - If the player wins, they need to get their winnings plus
+		 * their original bet back. The prior way of handling this was to simply calculate
+		 * winnings at the end of the round and make adjustments to their "account", but 
+		 * when money was changed to be bet at the start of the round, the players winnings
+		 * weren't adjusted for this. By adding the player's bet back on top of the winnings
+		 * and giving it back to them, players now actually gain money when they win a High Pair 
+		 * (as they should).
+		 * 
+		 * Fun fact: This code's also slightly more efficient; we don't change the player's
+		 * money if there's no sum to subtract/add!
+		 */
+		if (Integer.parseInt(results[1]) != 0){
+			player.setMoney(player.getMoney() + Integer.parseInt(results[1]) + totalBet);
+		}
 		if(gui.bonusIsChecked()){
 			player.setMoney(player.getMoney() + getBonus(results[0]));
 		}

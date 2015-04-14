@@ -176,8 +176,8 @@ public class LetItRideGUI extends JFrame{
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					JOptionPane.showMessageDialog(null, 
-							new ImageIcon(ImageIO.read(new File("src/images/PAYOUT_TABLE.png"))));
-				} catch (HeadlessException | IOException e) {
+							new ImageIcon(getClass().getResource("PAYOUT_TABLE.PNG")));
+				} catch (HeadlessException e) {
 					e.printStackTrace();
 				}
 			}
